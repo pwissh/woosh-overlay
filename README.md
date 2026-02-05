@@ -10,6 +10,12 @@ You should expect NOTHING from this repository. Better yet, I see NO REASON for 
 eselect repository add woosh-overlay git https://gitlab.com/pwish/woosh-overlay.git
 ```
 
+or the mirror
+
+```
+eselect repository add woosh-overlay git https://github.com/pwissh/woosh-overlay.git
+```
+
 or you know, /etc/portage/repos.conf and all.
 
 good luck!
