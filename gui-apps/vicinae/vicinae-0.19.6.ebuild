@@ -10,7 +10,7 @@ HOMEPAGE="https://github.com/vicinaehq/vicinae"
 
 SRC_URI="https://github.com/vicinaehq/vicinae/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
-VERSION_GIT_HASH="d2f38c2b1fff24c4aba5bb0ea2c2bddd4ea5a5df"
+VERSION_GIT_HASH="49c452bf0cd6083de91ca22113397b4e31c9dccf"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
@@ -63,7 +63,7 @@ src_configure() {
 
 	ts_modules=("api" "extension-manager")
 	for tsmodule in "${ts_modules[@]}"; do
-  		pushd "typescript/$tsmodule" >/dev/null || exit 1
+  		pushd "src/typescript/$tsmodule" >/dev/null || exit 1
     	elog "installing node modules for typescript module "$tsmodule""
     	npm ci
     	popd >/dev/null || exit 1
