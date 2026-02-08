@@ -26,11 +26,12 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
-# Unbundle test dependencies otherwise they are fetched from github at build time
+# --- unbundle test dependencies---------------------------
 PATCHES=(
 	"${FILESDIR}/${P}-unbundle-test-deps.patch"
 )
 
+# --- configure cmake -------------------------------------
 src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_SKIP_INSTALL_RULES=OFF
