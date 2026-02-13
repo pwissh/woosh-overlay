@@ -10,7 +10,7 @@ HOMEPAGE="https://github.com/vicinaehq/vicinae"
 
 SRC_URI="https://github.com/vicinaehq/vicinae/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
-VERSION_GIT_HASH="49c452bf0cd6083de91ca22113397b4e31c9dccf"
+VERSION_GIT_HASH="1399606ebe1e799c4c22c7fbcaeae155a6a3d6e4"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
