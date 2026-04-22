@@ -60,3 +60,12 @@ src_install() {
 		doins -r squashfs-root/usr/share/icons/*
 	fi
 }
+
+
+pkg_postinst() {
+	xdg_desktop_database_update
+}
+
+pkg_postrm() {
+	xdg_desktop_database_update
+}
