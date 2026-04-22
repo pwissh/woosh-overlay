@@ -57,16 +57,25 @@ src_install() {
 	fi
 
 	# Install icons
-	if [[ -d squashfs-root/usr/share/icons ]]; then
-		insinto /usr/share/icons
-		doins -r squashfs-root/usr/share/icons/*
+	local icon_src="squashfs-root/resources/assets/icons/png"
+
+	if [[ -d "${icon_src}" ]]; then
+	local size
+	for size in 16 32 48 64 128 256 512; do
+		if [[ -f "${icon_src}/${size}x${size}.png" ]]; then
+			insinto /usr/share/icons/hicolor/${size}x${size}/apps
+			newins "${icon_src}/${size}x${size}.png" hyperbeam.png
+		fi
+	done
 	fi
 }
 
 pkg_postinst() {
 	xdg_icon_cache_update
+	xdg_desktop_database_update
 }
 
 pkg_postrm() {
 	xdg_icon_cache_update
+	xdg_desktop_database_update
 }
