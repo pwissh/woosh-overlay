@@ -3,6 +3,8 @@
 
 EAPI=8
 
+inherit xdg
+
 DESCRIPTION="Hyperbeam shared browser and streaming virtual machine"
 HOMEPAGE="https://hyperbeam.com"
 SRC_URI="https://cdn.hyperbeam.com/Hyperbeam-${PV}.AppImage -> ${P}.AppImage"
@@ -61,11 +63,10 @@ src_install() {
 	fi
 }
 
-
 pkg_postinst() {
-	xdg_desktop_database_update
+	xdg_icon_cache_update
 }
 
 pkg_postrm() {
-	xdg_desktop_database_update
+	xdg_icon_cache_update
 }
