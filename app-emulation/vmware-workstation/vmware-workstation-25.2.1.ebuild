@@ -47,13 +47,13 @@ RDEPEND="
 	acct-group/vmware
 	app-emulation/vmware-host-modules
 	dev-libs/glib:2
+	dev-libs/libaio
 	dev-libs/openssl:=
 	gnome-base/librsvg
 	media-libs/libpulse
 	net-libs/libtirpc
 	sys-apps/pcsc-lite
 	sys-fs/fuse:0
-	dev-libs/libaio
 	virtual/libcrypt:=
 	x11-libs/gtk+:3
 	x11-libs/libX11
@@ -73,8 +73,6 @@ BDEPEND="
 # Suppress QA warnings about prebuilt binaries with non-standard RPATHs,
 # unresolved sonames, etc. — all expected for a bundled proprietary package
 QA_PREBUILT="*"
-QA_FLAGS_IGNORED="usr/lib/vmware-installer/.*"
-QA_SONAME="usr/lib/vmware-installer/.*"
 
 src_unpack() {
 	local bundle="${DISTDIR}/${MY_BUNDLE}"
@@ -178,7 +176,11 @@ src_install() {
 		|| die
 
 	# --- VMware installer component ---
-	# Kept for compatibility with any post-install scripts that invoke it
+	# Kept for compatibility with any post-install scripts that invoke it.
+	# The bundled Python lib-dynload .so files use $$ORIGIN in their RPATH
+	# which causes portage's ELF scanner to spam "$: bad substitution" errors
+	# during ld.so.cache regeneration — and they're never used in a packaged
+	# install anyway, so remove them.
 	cp -r \
 		vmware-installer/python \
 		vmware-installer/sopython \
@@ -187,6 +189,7 @@ src_install() {
 		vmware-installer/vmware-installer \
 		vmware-installer/vmware-installer.py \
 		"${ED}/usr/lib/vmware-installer/${vmware_installer_version}" || die
+	rm -rf "${ED}/usr/lib/vmware-installer/${vmware_installer_version}/python/lib/lib-dynload" || die
 
 	# --- ISO images (guest tools) ---
 	# Fetched separately from Broadcom's CDN in SRC_URI
@@ -210,7 +213,7 @@ src_install() {
 
 	# --- Fix permissions ---
 	# The bundle ships many executables as non-executable (644) — fix them all.
-	# I'll do this before fperms calls so suid bits are applied last and not lost.
+	# Do this before fperms calls so suid bits are applied last and not lost.
 	find "${ED}/usr/bin" -type f -exec chmod 755 {} +
 	find "${ED}/usr/lib/vmware/bin" -type f -exec chmod 755 {} +
 	find "${ED}/usr/lib/vmware/lib" -type f -name "*.so*" -exec chmod 755 {} +
@@ -291,6 +294,7 @@ src_install() {
 	# versions from files/ since I bypass the installer entirely.
 	# Dynamic fields (telemetryUUID, epoch timestamps) are intentionally
 	# omitted — VMware regenerates them at first run.
+	# Note: config has acceptEULA = "yes" pre-set — see EULA note in pkg_postinst
 	insinto /etc/vmware
 	newins "${FILESDIR}/vmware-bootstrap" bootstrap
 	doins "${FILESDIR}/config"
@@ -347,18 +351,9 @@ pkg_postinst() {
 			"INSERT INTO components(name,version,buildNumber,component_core_id,longName,description,type) VALUES('vmware-workstation','${MY_PV}',${_BUILDVER},1,'VMware Workstation','VMware Workstation',1);" || die
 	fi
 
-	# Pre-accept the EULA so VMware does not try to launch its installer
-	# on first run (the installer binary also lacks execute permissions
-	# in our setup and would cause a silent exit). If you choose to use
-	# this program you sort of have to accept it's EULA anyway.
-	local config="${EROOT}/etc/vmware/config"
-	if grep -q 'acceptEULA = "none"' "${config}" 2>/dev/null; then
-		einfo "Pre-accepting VMware EULA..."
-		sed -i \
-			-e 's/acceptEULA = "none"/acceptEULA = "yes"/' \
-			-e 's/acceptOVFEULA = "none"/acceptOVFEULA = "yes"/' \
-			"${config}" || die
-	fi
+	# Note: the EULA is pre-accepted in files/config (acceptEULA = "yes").
+	# By installing and using this package you are agreeing to VMware's EULA.
+	# The full text is at /usr/share/doc/vmware-workstation/EULA
 
 	if [[ -z $(getent group vmware | cut -d: -f4) ]]; then
 		ewarn "The 'vmware' group has no members yet."
