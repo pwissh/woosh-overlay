@@ -11,7 +11,7 @@ depend() {
 
 start() {
 	ebegin "Loading VMware kernel modules"
-	modprobe vmmon && modprobe vmnet
+	modprobe vmw_vmci && modprobe vmmon && modprobe vmnet
 	eend $? "Failed to load vmmon/vmnet — try: emerge @module-rebuild" || return 1
 
 	ebegin "Configuring VMware networks"
@@ -38,7 +38,7 @@ stop() {
 	eend $?
 
 	ebegin "Unloading VMware kernel modules"
-	rmmod vmnet vmmon 2>/dev/null
+	rmmod vmw_vmci vmnet vmmon 2>/dev/null
 	# Non-fatal — modules may still be in use if a VM is running
 	eend 0
 }
