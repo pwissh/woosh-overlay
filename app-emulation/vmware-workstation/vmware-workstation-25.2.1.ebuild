@@ -68,6 +68,7 @@ DEPEND="${RDEPEND}"
 
 BDEPEND="
 	dev-db/sqlite
+	dev-util/patchelf
 "
 
 # Suppress QA warnings about prebuilt binaries with non-standard RPATHs,
@@ -190,6 +191,12 @@ src_install() {
 		vmware-installer/vmware-installer.py \
 		"${ED}/usr/lib/vmware-installer/${vmware_installer_version}" || die
 	rm -rf "${ED}/usr/lib/vmware-installer/${vmware_installer_version}/python/lib/lib-dynload" || die
+	# Remove $$ORIGIN RPATH from bundled Python extension modules — portage's
+	# ld.so.cache regeneration script misparses $$ORIGIN as a shell variable
+	# causing "$: bad substitution" spam. These modules use VMware's internal
+	# Python loader and don't need system ldconfig to resolve their dependencies.
+	find "${ED}/usr/lib/vmware-installer" -name "*.so*" -type f \
+		-exec patchelf --remove-rpath {} + 2>/dev/null || true
 
 	# --- ISO images (guest tools) ---
 	# Fetched separately from Broadcom's CDN in SRC_URI
