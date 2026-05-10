@@ -15,12 +15,13 @@ start() {
 	eend $? "Failed to load vmmon/vmnet — try: emerge @module-rebuild" || return 1
 
 	ebegin "Configuring VMware networks"
-	/usr/lib/vmware/bin/vmware-networks --start
+	/usr/bin/vmware-networks --start
 	eend $?
 
 	if yesno "${VMWARE_USB:-yes}"; then
 		ebegin "Starting VMware USB arbitrator"
-		/usr/bin/vmware-usbarbitrator --server &
+		start-stop-daemon --start --background \
+			--exec /usr/bin/vmware-usbarbitrator -- -f
 		eend $?
 	fi
 }
@@ -28,12 +29,12 @@ start() {
 stop() {
 	if yesno "${VMWARE_USB:-yes}"; then
 		ebegin "Stopping VMware USB arbitrator"
-		/usr/bin/vmware-usbarbitrator --kill
+		/usr/bin/vmware-usbarbitrator -k
 		eend $?
 	fi
 
 	ebegin "Stopping VMware networks"
-	/usr/lib/vmware/bin/vmware-networks --stop
+	/usr/bin/vmware-networks --stop
 	eend $?
 
 	ebegin "Unloading VMware kernel modules"
