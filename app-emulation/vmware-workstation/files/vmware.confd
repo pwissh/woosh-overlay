@@ -1,0 +1,5 @@
+# /etc/conf.d/vmware
+# Configuration for the VMware Workstation OpenRC service
+
+# Set to "yes" to start the USB arbitrator (allows VMs to use USB devices)
+VMWARE_USB="yes"

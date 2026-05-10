@@ -1,0 +1,43 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="VMware Workstation services (networking, USB arbitration)"
+
+depend() {
+	need net
+	after udev
+}
+
+start() {
+	ebegin "Loading VMware kernel modules"
+	modprobe vmmon && modprobe vmnet
+	eend $? "Failed to load vmmon/vmnet — try: emerge @module-rebuild" || return 1
+
+	ebegin "Configuring VMware networks"
+	/usr/lib/vmware/bin/vmware-networks --start
+	eend $?
+
+	if yesno "${VMWARE_USB:-yes}"; then
+		ebegin "Starting VMware USB arbitrator"
+		/usr/bin/vmware-usbarbitrator --server &
+		eend $?
+	fi
+}
+
+stop() {
+	if yesno "${VMWARE_USB:-yes}"; then
+		ebegin "Stopping VMware USB arbitrator"
+		/usr/bin/vmware-usbarbitrator --kill
+		eend $?
+	fi
+
+	ebegin "Stopping VMware networks"
+	/usr/lib/vmware/bin/vmware-networks --stop
+	eend $?
+
+	ebegin "Unloading VMware kernel modules"
+	rmmod vmnet vmmon 2>/dev/null
+	# Non-fatal — modules may still be in use if a VM is running
+	eend 0
+}
