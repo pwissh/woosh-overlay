@@ -1,0 +1,14 @@
+--- a/fetch.c
++++ b/fetch.c
+@@ -615,8 +615,9 @@
+ 		if (flags.os) {
+ 			LOG_I("getting os name from /etc/os-release");
+ 			while (fgets(buffer, BUFFER_SIZE, os_release) &&
+-						 !(sscanf(buffer, "\nID=\"%s\"", user_info->os_name) ||
+-							 sscanf(buffer, "\nID=%s", user_info->os_name)))
++						 !(sscanf(buffer, "ID='%[^\']'", user_info->os_name) ||
++							 sscanf(buffer, "ID=\"%[^\"]\"", user_info->os_name) ||
++							 	sscanf(buffer, "ID=%s", user_info->os_name)))
+ 				;
+ 			// sometimes for some reason sscanf reads the last '\"' too
+ 			int os_name_len = strlen(user_info->os_name);

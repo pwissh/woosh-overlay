@@ -1,0 +1,11 @@
+--- a/fetch.c
++++ b/fetch.c
+@@ -365,7 +365,7 @@
+ 	#ifndef _WIN32
+ 	// all supported package managers
+ 	struct package_manager pkgmans[] = {
+-			{PKGPATH "apt", "apt list --installed 2> /dev/null | wc -l", "(apt)"},
++			{PKGPATH "apt", "[ -f /etc/debian_version ] && apt list --installed 2> /dev/null | wc -l || echo 0", "(apt)"},
+ 			{PKGPATH "apk", "apk info 2> /dev/null | wc -l", "(apk)"},
+ 			// {PKGPATH"dnf","dnf list installed 2> /dev/null | wc -l", "(dnf)"}, // according to https://stackoverflow.com/questions/48570019/advantages-of-dnf-vs-rpm-on-fedora, dnf and rpm return the same number of packages
+ 			{PKGPATH "qlist", "qlist -I 2> /dev/null | wc -l", "(emerge)"},

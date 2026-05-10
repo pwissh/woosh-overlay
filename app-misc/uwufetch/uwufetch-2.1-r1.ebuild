@@ -36,6 +36,11 @@ uwufetch_v() {
 	fi
 }
 
+PATCHES=(
+"${FILESDIR}/fix-os-detection.patch"
+"${FILESDIR}/fix-gentoo-apt.patch"
+)
+
 src_prepare() {
 	sed -E -i \
 		-e 's/^AR = ar/AR ?= ar/' \
