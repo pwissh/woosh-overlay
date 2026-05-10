@@ -377,7 +377,26 @@ pkg_postinst() {
 	fi
 }
 
+pkg_prerm() {
+	# Remove the installer database created in pkg_postinst,
+	# portage doesn't track files created outside of src_install
+	rm -f "${EROOT}/etc/vmware-installer/database"
+
+	# Unload kernel modules if loaded, the vmware service should
+	# handle this but be safe
+	if lsmod | grep -q vmmon; then
+		einfo "Stopping VMware services before removal..."
+		"${EROOT}/etc/init.d/vmware" stop 2>/dev/null || true
+	fi
+}
+
 pkg_postrm() {
 	xdg_desktop_database_update
 	xdg_icon_cache_update
+
+	# Remind about user data that was intentionally left behind
+	if [[ -d /var/lib/vmware ]]; then
+		elog "/var/lib/vmware was left intact on purpose, remove manually if no longer needed."
+	fi
+
 }
