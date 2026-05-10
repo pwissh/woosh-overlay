@@ -324,7 +324,7 @@ src_install() {
 	local DISABLE_AUTOFORMATTING=yes
 	local DOC_CONTENTS="
 To use VMware as a regular user, add yourself to the 'vmware' group:
-  gpasswd -a YOUR_USER vmware
+  usermod -aG vmware $USER
 Then log out and back in (or: newgrp vmware).
 
 Kernel modules are provided by app-emulation/vmware-host-modules.
@@ -343,6 +343,14 @@ pkg_postinst() {
 	xdg_desktop_database_update
 	xdg_icon_cache_update
 
+	elog ""
+	elog "IMPORTANT: By installing this package you have agreed to the"
+	elog "VMware Workstation End User License Agreement."
+	elog "More information available at:"
+	elog "  https://www.broadcom.com/company/legal/licensing"
+	elog "  bzcat /usr/share/doc/vmware-workstation/EULA.bz2"
+	elog ""
+}
 	# Create the VMware installer database that VMware checks at startup
 	# to verify its components are registered. Without this VMware silently
 	# exits immediately on first launch.
@@ -360,12 +368,12 @@ pkg_postinst() {
 
 	# Note: the EULA is pre-accepted in files/config (acceptEULA = "yes").
 	# By installing and using this package you are agreeing to VMware's EULA.
-	# The full text is at /usr/share/doc/vmware-workstation/EULA
+	# The full text is at /usr/share/doc/vmware-workstation/EULA.bz2
 
 	if [[ -z $(getent group vmware | cut -d: -f4) ]]; then
 		ewarn "The 'vmware' group has no members yet."
 		ewarn "To use VMware as a regular user:"
-		ewarn "  gpasswd -a YOUR_USER vmware"
+		ewarn "  usermod -aG vmware $USER"
 	fi
 }
 
