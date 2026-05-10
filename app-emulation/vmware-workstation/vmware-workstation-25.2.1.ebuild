@@ -73,6 +73,8 @@ BDEPEND="
 # Suppress QA warnings about prebuilt binaries with non-standard RPATHs,
 # unresolved sonames, etc. — all expected for a bundled proprietary package
 QA_PREBUILT="*"
+QA_FLAGS_IGNORED="usr/lib/vmware-installer/.*"
+QA_SONAME="usr/lib/vmware-installer/.*"
 
 src_unpack() {
 	local bundle="${DISTDIR}/${MY_BUNDLE}"
