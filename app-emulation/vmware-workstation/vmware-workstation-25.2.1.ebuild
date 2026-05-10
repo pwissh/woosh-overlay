@@ -342,6 +342,7 @@ pkg_postinst() {
 	readme.gentoo_print_elog
 	xdg_desktop_database_update
 	xdg_icon_cache_update
+	xdg_mimeinfo_database_update
 
 	elog ""
 	elog "IMPORTANT: By installing this package you have agreed to the"
@@ -393,6 +394,8 @@ pkg_prerm() {
 pkg_postrm() {
 	xdg_desktop_database_update
 	xdg_icon_cache_update
+	xdg_mimeinfo_database_update
+	xdg_mimeinfo_database_update
 
 	# Remind about user data that was intentionally left behind
 	if [[ -d /var/lib/vmware ]]; then
