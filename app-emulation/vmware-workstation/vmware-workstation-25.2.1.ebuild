@@ -305,6 +305,7 @@ src_install() {
 	insinto /etc/vmware
 	newins "${FILESDIR}/vmware-bootstrap" bootstrap
 	doins "${FILESDIR}/config"
+	doins "${FILESDIR}/networking"
 
 	insinto /etc/vmware-vix
 	newins "${FILESDIR}/vmware-vix-bootstrap" bootstrap
