@@ -158,13 +158,6 @@ src_install() {
 		KERNEL=="vmnet*", GROUP="vmware", MODE="0660"
 	EOF
 
-	# Load modules automatically at boot via OpenRC's modules-load mechanism
-	insinto /etc/modules-load.d
-	newins - vmware.conf <<-EOF
-		vmmon
-		vmnet
-	EOF
-
 	local DISABLE_AUTOFORMATTING=yes
 	local DOC_CONTENTS="
 VMware kernel modules installed for kernel ${KV_FULL}.
