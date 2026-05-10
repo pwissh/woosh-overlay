@@ -350,7 +350,7 @@ pkg_postinst() {
 	elog "  https://www.broadcom.com/company/legal/licensing"
 	elog "  bzcat /usr/share/doc/vmware-workstation/EULA.bz2"
 	elog ""
-}
+
 	# Create the VMware installer database that VMware checks at startup
 	# to verify its components are registered. Without this VMware silently
 	# exits immediately on first launch.
