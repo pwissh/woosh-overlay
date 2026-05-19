@@ -43,10 +43,38 @@ src_install() {
 	doins -r squashfs-root/*
 
 	# Ensure main executable is executable and symlink to /usr/bin
-	if [[ -f "${ED}${appdir}/hyperbeam" ]]; then
-		fperms +x "${appdir}/hyperbeam"
-		dosym "${appdir}/hyperbeam" /usr/bin/hyperbeam
-	fi
+	fperms +x "${appdir}/hyperbeam"
+	fperms +x "${appdir}/AppRun"
+	fperms +x "${appdir}/resources/vendor/Hyperbeam_Proxy"
+	fperms 4755 "${appdir}/chrome-sandbox"
+
+	local lib
+	for lib in \
+		libEGL.so \
+		libffmpeg.so \
+		libGLESv2.so \
+		libvk_swiftshader.so \
+		libvulkan.so.1 \
+		swiftshader/libEGL.so \
+		swiftshader/libGLESv2.so
+	do
+		[[ -f "${ED}${appdir}/${lib}" ]] && fperms +x "${appdir}/${lib}"
+	done
+
+	local usrlib
+	for usrlib in \
+		libappindicator.so.1 \
+		libgconf-2.so.4 \
+		libindicator.so.7 \
+		libnotify.so.4 \
+		libXss.so.1 \
+		libXtst.so.6
+	do
+		[[ -f "${ED}${appdir}/usr/lib/${usrlib}" ]] && \
+			fperms +x "${appdir}/usr/lib/${usrlib}"
+	done
+
+	dosym "${appdir}/hyperbeam" /usr/bin/hyperbeam
 
 	# Patch + install top-level desktop file
 	if [[ -f squashfs-root/hyperbeam.desktop ]]; then
