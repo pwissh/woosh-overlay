@@ -123,11 +123,12 @@ src_compile() {
 		LDFLAGS=""
 		VM_UNAME="${KV_FULL}"
 		HEADER_DIR="${KV_DIR}/include"
+		ARCH=x86
 	)
 
 	if [[ "${KERNEL_CC}" == *clang* ]]; then
-		kargs+=( LLVM=1 LLVM_IAS=1 ARCH=x86 )
-		einfo "Detected Clang kernel toolchain — enabling LLVM=1 LLVM_IAS=1 ARCH=x86"
+		kargs+=( LLVM=1 LLVM_IAS=1 )
+		einfo "Detected Clang kernel toolchain — enabling LLVM=1 LLVM_IAS=1"
 	fi
 
 	einfo "Building vmmon..."
