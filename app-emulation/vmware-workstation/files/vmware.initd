@@ -5,8 +5,7 @@
 description="VMware Workstation services (networking, USB arbitration)"
 
 depend() {
-	need net
-	after udev
+	after udev net
 }
 
 start() {
@@ -16,14 +15,23 @@ start() {
 	eend $? "Failed to load vmmon/vmnet — try: emerge @module-rebuild" || return 1
 
 	ebegin "Configuring VMware networks"
-	if /usr/bin/vmware-networks --start; then
+	/usr/bin/vmware-networks --start
+	if ls /dev/vmnet* >/dev/null 2>&1; then
 		eend 0
+		# Report which specific interfaces failed to come up
+		[[ ! -e /dev/vmnet1 ]] && \
+			ewarn "vmnet1 (host-only) did not initialize."
+		if [[ ! -e /dev/vmnet8 ]]; then
+			ewarn "vmnet8 (NAT) did not initialize."
+			ewarn "VMs using NAT networking will have no network access."
+			ewarn "Once network is available, run: rc-service vmware restart"
+		fi
 	else
 		eend 1
-		ewarn "VMware network configuration failed — no virtual network interfaces created."
+		ewarn "No VMware network interfaces were created."
 		ewarn "This is usually caused by no network connection being available."
-		ewarn "Once network is up, run: rc-service vmware restart"
-		ewarn "VMs can still be started but will have no network access."
+		ewarn "VMs can still start but will have no network access."
+		ewarn "Once network is available, run: rc-service vmware restart"
 	fi
 
 	if yesno "${VMWARE_USB:-yes}"; then
@@ -46,7 +54,7 @@ stop() {
 	eend $?
 
 	ebegin "Unloading VMware kernel modules"
-	rmmod vmw_vmci vmnet vmmon 2>/dev/null
+	rmmod vmnet vmmon vmw_vmci 2>/dev/null
 	# Non-fatal — modules may still be in use if a VM is running
 	eend 0
 }
