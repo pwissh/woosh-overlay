@@ -11,12 +11,20 @@ depend() {
 
 start() {
 	ebegin "Loading VMware kernel modules"
-	modprobe vmw_vmci && modprobe vmmon && modprobe vmnet
+	modprobe vmw_vmci 2>/dev/null || true
+	modprobe vmmon && modprobe vmnet
 	eend $? "Failed to load vmmon/vmnet — try: emerge @module-rebuild" || return 1
 
 	ebegin "Configuring VMware networks"
-	/usr/bin/vmware-networks --start
-	eend $?
+	if /usr/bin/vmware-networks --start; then
+		eend 0
+	else
+		eend 1
+		ewarn "VMware network configuration failed — no virtual network interfaces created."
+		ewarn "This is usually caused by no network connection being available."
+		ewarn "Once network is up, run: rc-service vmware restart"
+		ewarn "VMs can still be started but will have no network access."
+	fi
 
 	if yesno "${VMWARE_USB:-yes}"; then
 		ebegin "Starting VMware USB arbitrator"
