@@ -10,7 +10,7 @@ HOMEPAGE="https://github.com/vicinaehq/vicinae"
 
 SRC_URI="https://github.com/vicinaehq/vicinae/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
-VERSION_GIT_HASH="6c5bb170394bbf464e242dff9ff492dd6f7b0e5c"
+VERSION_GIT_HASH="9623fbe882ae8d76bfe64ce9210ac374a3cea8b8"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
@@ -50,12 +50,8 @@ RESTRICT="network-sandbox"
 PATCHES=() # All disabled because I figured out a way to do it without patching the fuck out of it.
 
 # --- prepare sources ---------------------------------------------
-# sed patch is my band-aid solution for the new layershellqt6 changes.
 src_prepare() {
 	cmake_src_prepare || die "preparing the source was unsuccessful."
-	sed -i 's/lshell->setWantsToBeOnActiveScreen(true);//' \
-		src/server/src/qml/launcher-window.cpp \
-		src/server/src/qml/hud-bridge.cpp
 }
 
 # --- configure cmake ---------------------------------------------
